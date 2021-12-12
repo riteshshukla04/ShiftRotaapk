@@ -7,25 +7,38 @@ import DatePicker from 'react-native-date-picker'
 import { Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {useEffect} from "react";
-
+import axios from 'axios';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const HomePage=()=>{
-    const [date, setDate] = useState(new Date())
-    const [shift, setShift] = useState({})
-    const fetchData = () => {
-        return fetch(`http://shiftrotaapi.pythonanywhere.com/${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}/`)
-              .then((response) => response.json())
-              .then((data) => setShift(data));}
-      
-    console.log(date);
+    const [date, setDate] = useState(new Date());
+    const [shift, setShift] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [bool, setBool] = useState(0);
+    const fetchData = async() => {
+        setLoading((loading)=>(!loading))  
+        const response=await axios.get(`https://shiftrotaapi.pythonanywhere.com/${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}/`).then((response=>setShift(response.data)))
+        setLoading((loading)=>(!loading))  
+    }
+    if (bool===0){
+        fetchData();
+        setBool(1);
+    }
     
-    fetchData();
+    
+    
+
     
    
  return(
     <View style={styles.container}>
+        <Spinner
+          visible={loading}
+          textContent={'Loading...'}
+          textStyle={styles.spinnerTextStyle}
+        />
         <View  style={styles.DateButton}>
-        <DatePicker date={date} mode="date" onDateChange={setDate} />
+        <DatePicker date={date} mode="date" onDateChange={date=>{setDate(date);fetchData()}} />
         </View>
         <View style={styles.NonExecutive}>
             <View style={styles.Title}>
@@ -108,6 +121,10 @@ const styles=StyleSheet.create({
     ShiftView:{
         display:"flex",
         flexDirection:"row",
-    }
+    },
+    spinnerTextStyle: {
+        color: '#FFF'
+      },
+
 })
 export default HomePage;
