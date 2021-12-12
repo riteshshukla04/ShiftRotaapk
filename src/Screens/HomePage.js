@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react'
 import { View, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -10,35 +9,34 @@ import {useEffect} from "react";
 import axios from 'axios';
 import Spinner from 'react-native-loading-spinner-overlay';
 
-const HomePage=()=>{
-    const [date, setDate] = useState(new Date());
-    const [shift, setShift] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [bool, setBool] = useState(0);
-    const fetchData = async() => {
-        setLoading((loading)=>(!loading))  
-        const response=await axios.get(`https://shiftrotaapi.pythonanywhere.com/${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}/`).then((response=>setShift(response.data)))
-        setLoading((loading)=>(!loading))  
-    }
-    if (bool===0){
-        fetchData();
-        setBool(1);
-    }
-    
-    
-    
 
+
+const HomePage=()=>{
+    const [date, setDate] = useState(new Date())
+    const [shift, setShift] = useState({})
+    const [loading, setLoading] = useState(false)
+
+    const fetchData=async(date)=>{
+        setLoading(loading=>!loading);
+        await axios.get(`https://shiftrotaapi.pythonanywhere.com/${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}/`).then((response=>setShift(response.data)));
+        setLoading(loading=>!loading);
+    }
+
+      
+    console.log(shift);
+    
+    
     
    
  return(
     <View style={styles.container}>
-        <Spinner
+         <Spinner
           visible={loading}
           textContent={'Loading...'}
           textStyle={styles.spinnerTextStyle}
         />
         <View  style={styles.DateButton}>
-        <DatePicker date={date} mode="date" onDateChange={date=>{setDate(date);fetchData()}} />
+        <DatePicker date={date} mode="date" onDateChange={date=>{setDate(date),fetchData(date)}}/>
         </View>
         <View style={styles.NonExecutive}>
             <View style={styles.Title}>
@@ -125,6 +123,5 @@ const styles=StyleSheet.create({
     spinnerTextStyle: {
         color: '#FFF'
       },
-
 })
 export default HomePage;
