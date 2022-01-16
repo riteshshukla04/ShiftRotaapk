@@ -1,127 +1,154 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import DatePicker from 'react-native-date-picker'
-import { Button } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import {useEffect} from "react";
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import DatePicker from 'react-native-date-picker';
+import {useEffect} from 'react';
 import axios from 'axios';
 import Spinner from 'react-native-loading-spinner-overlay';
 
 
+const HomePage = () => {
+  const [date, setDate] = useState(new Date());
+  const [shift, setShift] = useState({});
+  const [loading, setLoading] = useState(false);
 
-const HomePage=()=>{
-    const [date, setDate] = useState(new Date())
-    const [shift, setShift] = useState({})
-    const [loading, setLoading] = useState(false)
+  const fetchData = async date => {
+    setLoading(loading => !loading);
+    await axios
+      .get(
+        `https://shiftrota-api.herokuapp.com/${date.getFullYear()}-${
+          date.getMonth() + 1
+        }-${date.getDate()}/`,
+      )
+      .then(response => setShift(response.data));
+    setLoading(loading => !loading);
+  };
+  useEffect(() => {
+    var today = new Date();
 
-    const fetchData=async(date)=>{
-        setLoading(loading=>!loading);
-        await axios.get(`https://shiftrotaapi.pythonanywhere.com/${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}/`).then((response=>setShift(response.data)));
-        setLoading(loading=>!loading);
-    }
+    fetchData(today);
+  }, []);
 
-      
-    console.log(shift);
-    
-    
-    
-   
- return(
+  console.log(shift);
+
+  return (
     <View style={styles.container}>
-         <Spinner
-          visible={loading}
-          textContent={'Loading...'}
-          textStyle={styles.spinnerTextStyle}
+      <Spinner
+        visible={loading}
+        textContent={'Loading...'}
+        textStyle={styles.spinnerTextStyle}
+      />
+      <View style={styles.DateButton}>
+        <DatePicker
+          date={date}
+          mode="date"
+          onDateChange={date => {
+            setDate(date), fetchData(date);
+          }}
         />
-        <View  style={styles.DateButton}>
-        <DatePicker date={date} mode="date" onDateChange={date=>{setDate(date),fetchData(date)}}/>
-        </View>
+      </View>
+      <ScrollView>
         <View style={styles.NonExecutive}>
-            <View style={styles.Title}>
+          <View style={styles.Title}>
             <Text style={styles.TitleText}>Non Executive Shift</Text>
-            </View>
+          </View>
+          <View style={styles.shift}>
             <View style={styles.shift}>
-            <View style={styles.shift}>
-            <View style={styles.ShiftView}><Text style={styles.ShiftText}>Group A</Text><Text style={styles.ShiftText}>{shift["na"]}</Text></View>
-            <View style={styles.ShiftView}><Text style={styles.ShiftText}>Group B</Text><Text style={styles.ShiftText}>{shift["nb"]}</Text></View>
-            <View style={styles.ShiftView}><Text style={styles.ShiftText}>Group C</Text><Text style={styles.ShiftText}>{shift["nc"]}</Text></View>
-            <View style={styles.ShiftView}><Text style={styles.ShiftText}>Group D</Text><Text style={styles.ShiftText}>{shift["nd"]}</Text></View>
+              <View style={styles.ShiftView}>
+                <Text style={styles.ShiftText}>Group A</Text>
+                <Text style={styles.ShiftText}>{shift['na']}</Text>
+              </View>
+              <View style={styles.ShiftView}>
+                <Text style={styles.ShiftText}>Group B</Text>
+                <Text style={styles.ShiftText}>{shift['nb']}</Text>
+              </View>
+              <View style={styles.ShiftView}>
+                <Text style={styles.ShiftText}>Group C</Text>
+                <Text style={styles.ShiftText}>{shift['nc']}</Text>
+              </View>
+              <View style={styles.ShiftView}>
+                <Text style={styles.ShiftText}>Group D</Text>
+                <Text style={styles.ShiftText}>{shift['nd']}</Text>
+              </View>
             </View>
-            </View>
-            
+          </View>
         </View>
         <View style={styles.NonExecutive}>
-            <View style={styles.Title}>
+          <View style={styles.Title}>
             <Text style={styles.TitleText}>Executive Shift</Text>
+          </View>
+          <View style={styles.shift}>
+            <View style={styles.ShiftView}>
+              <Text style={styles.ShiftText}>Group A</Text>
+              <Text style={styles.ShiftText}>{shift['ea']}</Text>
             </View>
-            <View style={styles.shift}>
-            <View style={styles.ShiftView}><Text style={styles.ShiftText}>Group A</Text><Text style={styles.ShiftText}>{shift["ea"]}</Text></View>
-            <View style={styles.ShiftView}><Text style={styles.ShiftText}>Group B</Text><Text style={styles.ShiftText}>{shift["eb"]}</Text></View>
-            <View style={styles.ShiftView}><Text style={styles.ShiftText}>Group C</Text><Text style={styles.ShiftText}>{shift["ec"]}</Text></View>
-            <View style={styles.ShiftView}><Text style={styles.ShiftText}>Group D</Text><Text style={styles.ShiftText}>{shift["ed"]}</Text></View>
+            <View style={styles.ShiftView}>
+              <Text style={styles.ShiftText}>Group B</Text>
+              <Text style={styles.ShiftText}>{shift['eb']}</Text>
             </View>
-            
+            <View style={styles.ShiftView}>
+              <Text style={styles.ShiftText}>Group C</Text>
+              <Text style={styles.ShiftText}>{shift['ec']}</Text>
+            </View>
+            <View style={styles.ShiftView}>
+              <Text style={styles.ShiftText}>Group D</Text>
+              <Text style={styles.ShiftText}>{shift['ed']}</Text>
+            </View>
+          </View>
         </View>
-       
+      </ScrollView>
     </View>
- )
-}
+  );
+};
 
-
-const styles=StyleSheet.create({
-    container:{
-        backgroundColor:"#F9F9F9",
-        minHeight:'100%',
-        display:"flex",
-        flex:1,
-    },
-    DateButton:{
-        alignItems:"center",
-        backgroundColor:"white",
-        width:'100%',
-        height:'30%',
-        justifyContent:"center",
-       
-    },
-    Button:{
-        justifyContent:"center",
-        backgroundColor:"white"
-    },
-    NonExecutive:{
-        borderWidth:3,
-        margin:10,
-        padding:10,
-        borderRadius:10,
-
-    },
-    TitleText:{
-        alignItems:"center",
-        color:"#797E95",
-        fontSize:25,
-        fontFamily:"Roboto-Black",
-    },
-    Title:{
-        alignItems:"center",
-    },
-    shift:{
-        
-        margin:10,
-    },
-    ShiftText:{
-        fontFamily:"Roboto-Medium",
-        color:"#797E95",
-        fontSize :20,
-        marginLeft:5,
-        marginRight:10,
-    },
-    ShiftView:{
-        display:"flex",
-        flexDirection:"row",
-    },
-    spinnerTextStyle: {
-        color: '#FFF'
-      },
-})
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#F9F9F9',
+    minHeight: '100%',
+    display: 'flex',
+    flex: 1,
+  },
+  DateButton: {
+    alignItems: 'center',
+    backgroundColor: 'white',
+    width: '100%',
+    height: '30%',
+    justifyContent: 'center',
+  },
+  Button: {
+    justifyContent: 'center',
+    backgroundColor: 'white',
+  },
+  NonExecutive: {
+    borderWidth: 3,
+    margin: 10,
+    padding: 10,
+    borderRadius: 10,
+  },
+  TitleText: {
+    alignItems: 'center',
+    color: '#797E95',
+    fontSize: 25,
+    fontFamily: 'Roboto-Black',
+  },
+  Title: {
+    alignItems: 'center',
+  },
+  shift: {
+    margin: 10,
+  },
+  ShiftText: {
+    fontFamily: 'Roboto-Medium',
+    color: '#797E95',
+    fontSize: 20,
+    marginLeft: 5,
+    marginRight: 10,
+  },
+  ShiftView: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  spinnerTextStyle: {
+    color: '#FFF',
+  },
+});
 export default HomePage;
